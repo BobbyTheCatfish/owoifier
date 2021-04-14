@@ -70,9 +70,9 @@ module.exports = class Owoify extends Plugin {
     typingNotif() {
         const TypingUsers = getModule(
             m => 
-            m.type &&
-            m.type.render &&
-            m.type.render.displayName === "TypingUsers",
+            m.channel &&
+            m.channel.type &&
+            m.channel.type.render.displayName === "TypingUsers",
             false
         );
 
