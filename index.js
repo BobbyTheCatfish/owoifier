@@ -68,17 +68,11 @@ module.exports = class Owoify extends Plugin {
     }
 
     typingNotif() {
-        const TypingUsers = getModule(
-            m => 
-            m.channel &&
-            m.channel.type &&
-            m.channel.type.render.displayName === "TypingUsers",
-            false
-        );
+        const TypingUsers = getModule(['TypingUsers']);
 
         inject(
             "owoiferNotif",
-            TypingUsers.channel.type,
+            TypingUsers,
             "render",
             (arg, res) => {
                 const props = findInReactTree(
