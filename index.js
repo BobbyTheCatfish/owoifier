@@ -1,12 +1,14 @@
 const { Plugin } = require('powercord/entities');
 const { getModule, React } = require('powercord/webpack');
 const { inject, uninject } = require('powercord/injector');
+const { findInReactTree } = require('powercord/util');
 const owoify = require('owoify-js').default;
 
 const Settings = require('./components/Settings');
 
 module.exports = class Owoify extends Plugin {
     async startPlugin() {
+        this.typingNotif();
         powercord.api.settings.registerSettings(this.entityID, {
             category: this.entityID,
             label: 'Owoifier',
@@ -65,9 +67,42 @@ module.exports = class Owoify extends Plugin {
         });
     }
 
+    typingNotif() {
+        const TypingUsers = getModule(
+            m => 
+            m.type &&
+            m.type.render &&
+            m.type.render.displayName === "TypingUsers",
+            false
+        );
+
+        inject(
+            "owoiferNotif",
+            TypingUsers.type,
+            "render",
+            (arg, res) => {
+                const props = findInReactTree(
+                    res,
+                    r => r && r.typingUsers
+                );
+
+                const element = React.createElement(
+                    "div", {
+                        className: ".owoifierNotif",
+                        onClick: () => console.log("uwuclick"),
+                    }
+                );
+                props.children.push(element);
+                return res;                
+            }
+        );
+        TypingUsers.type.render.displayName = "TypingUsers";
+    }
+
     pluginWillUnload() {
         powercord.api.settings.unregisterSettings(this.entityID);
         uninject("owoifierSend");
+        uninject("owoifierNotif");
         powercord.api.commands.unregisterCommand('toggleowo');
         powercord.api.commands.unregisterCommand('owo');
     }    
